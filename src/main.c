@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include "uart.h"
 #include "led_16x2.h"
+#include "bme280_get_temperature.h"
 
 int main(int argc, char *argv[]) {
   int uart = init_uart();
@@ -11,6 +12,8 @@ int main(int argc, char *argv[]) {
   close(uart);
 
   lcd_print(30.5, 28.7, 34.0);
+
+  bme280_get_temperature();
 
   return 0;
 }
