@@ -40,12 +40,12 @@ void lcd_print(float tr, float ti, float te) {
   delay(2000);
   ClrLcd();
   lcdLoc(LINE1);
-  typeln("TR: ");
+  typeln("TR:");
   typeFloat(tr);
   lcdLoc(LINE2);
-  typeln("TI: ");
+  typeln("TI:");
   typeFloat(ti);
-  typeln(" TE: ");
+  typeln(" TE:");
   typeFloat(te);
 }
 
