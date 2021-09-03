@@ -111,3 +111,31 @@ float read_uart_message(int uart, int code) {
     return response_integer;
   }
 }
+
+float potentiometer_temperature(int uart, float TR) {
+  write_uart_message(uart, 1);
+  
+  float TR_temp = read_uart_message(uart, 1);
+  
+  if (TR_temp < 0) {
+    TR_temp = TR;
+  }
+
+  return TR_temp;
+}
+
+float DS18B20_temperature(int uart, float TI) {
+  write_uart_message(uart, 0);
+
+  float TI_temp = read_uart_message(uart, 0);
+  
+  if (TI_temp < 0) {
+    TI_temp = TI;
+  }
+
+  return TI_temp;
+}
+
+void close_uart(int uart) {
+  close(uart);
+}
