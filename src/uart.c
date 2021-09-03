@@ -4,17 +4,7 @@
 #include <fcntl.h>   // Used for UART
 #include <termios.h> // Used for UART
 #include "crc16.h"
-
-#define SERVER_CODE 0x01
-#define REQUEST_CODE 0x23
-#define SEND_CODE 0x16
-#define REQUEST_DS18B20_TEMPERATURE 0xC1
-#define REQUEST_POTENTIOMETER_TEMPERATURE 0xC2
-#define REQUEST_KEY_STATE 0xC3
-#define SEND_CONTROL_SIGNAL 0xD1
-#define DS18B20 0
-#define POTENTIOMETER 1
-#define KEY_STATE 2
+#include "uart.h"
 
 int init_uart() {
   int uart0_filestream = -1;
@@ -67,7 +57,7 @@ void write_uart_message(int uart, int code) {
   p_tx_buffer += 2;
 
   if (uart != -1) {
-    printf("Escrevendo caracteres na UART ...");
+    printf("Escrevendo caracteres na UART ...\n");
 
     int count = write(uart, &tx_buffer[0], (p_tx_buffer - &tx_buffer[0]));
 
@@ -81,7 +71,9 @@ void write_uart_message(int uart, int code) {
   sleep(1);
 }
 
-void read_uart_message(int uart, int code) {
+float read_uart_message(int uart, int code) {
+  float response_float;
+  int response_integer;
   //-------------- CHECK FOR ANY RX BYTES --------------
   if (uart != -1) {
     // Read up to 255 characters from the port if they are there
@@ -90,20 +82,32 @@ void read_uart_message(int uart, int code) {
 
     if (rx_length < 0) {
       printf("Erro na leitura! RX_LENGTH: %d\n", rx_length);
+      response_float = -1;
+      response_integer = -1;
     } else if (rx_length == 0) {
       printf("Nenhum dado disponível.\n");
+      response_float = -1;
+      response_integer = -1;
     } else {
       rx_buffer[rx_length] = '\0';
 
       if (code == 0 || code == 1) {
         float float_data;
         memcpy(&float_data, &rx_buffer[3], 4);
-        printf("Float: %f\n", float_data);
+        // printf("Float: %f\n", float_data);
+        response_float = float_data;
       } else {
         int integer_data;
         memcpy(&integer_data, &rx_buffer[3], 4);
-        printf("Integer: %d\n", integer_data);
+        // printf("Integer: %d\n", integer_data);
+        response_integer = integer_data;
       }
     }
+  }
+
+  if (code == 0 || code == 1) {
+    return response_float;
+  } else {
+    return response_integer;
   }
 }
