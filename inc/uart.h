@@ -8,12 +8,14 @@
 #define DS18B20 0
 #define POTENTIOMETER 1
 #define KEY_STATE 2
+#define CONTROL_SIGNAL 3
 
 #ifndef UART_H_
 #define UART_H_
 
 int init_uart();
-void write_uart_message(int uart, int code);
+void write_uart_message_request(int uart, int code);
+void write_uart_message_send(int uart, int control_signal);
 float read_uart_message(int uart, int code);
 float potentiometer_temperature(int uart, float TR);
 float DS18B20_temperature(int uart, float TI);

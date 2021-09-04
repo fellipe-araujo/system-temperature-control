@@ -29,7 +29,7 @@ int init_uart() {
   return uart0_filestream;
 }
 
-void write_uart_message(int uart, int code) {
+void write_uart_message_request(int uart, int code) {
   unsigned char tx_buffer[20];
   unsigned char *p_tx_buffer;
   p_tx_buffer = &tx_buffer[0];
@@ -71,9 +71,48 @@ void write_uart_message(int uart, int code) {
   sleep(1);
 }
 
+void write_uart_message_send(int uart, int control_signal) {
+  unsigned char tx_buffer[20];
+  unsigned char *p_tx_buffer;
+  p_tx_buffer = &tx_buffer[0];
+
+  *p_tx_buffer++ = SERVER_CODE;
+  *p_tx_buffer++ = SEND_CODE;
+  *p_tx_buffer++ = SEND_CONTROL_SIGNAL;
+
+  *p_tx_buffer++ = 3;
+  *p_tx_buffer++ = 7;
+  *p_tx_buffer++ = 2;
+  *p_tx_buffer++ = 3;
+
+  memcpy(&tx_buffer[(p_tx_buffer - &tx_buffer[0])], &control_signal, 4);
+
+  p_tx_buffer += 4;
+
+  short crc = calcula_CRC(tx_buffer, (p_tx_buffer - &tx_buffer[0]));
+
+  memcpy(&tx_buffer[(p_tx_buffer - &tx_buffer[0])], &crc, 2);
+
+  p_tx_buffer += 2;
+
+  if (uart != -1) {
+    printf("Escrevendo caracteres na UART ...\n");
+
+    int count = write(uart, &tx_buffer[0], (p_tx_buffer - &tx_buffer[0]));
+
+    if (count < 0) {
+      printf("UART TX error!\n");
+    } else {
+      printf("Escrito!\n");
+    }
+  }
+
+  sleep(1);
+}
+
 float read_uart_message(int uart, int code) {
-  float response_float;
-  int response_integer;
+  float response_float = 0.0;
+  int response_integer = 0;
   //-------------- CHECK FOR ANY RX BYTES --------------
   if (uart != -1) {
     // Read up to 255 characters from the port if they are there
@@ -113,7 +152,7 @@ float read_uart_message(int uart, int code) {
 }
 
 float potentiometer_temperature(int uart, float TR) {
-  write_uart_message(uart, 1);
+  write_uart_message_request(uart, 1);
   
   float TR_temp = read_uart_message(uart, 1);
   
@@ -125,7 +164,7 @@ float potentiometer_temperature(int uart, float TR) {
 }
 
 float DS18B20_temperature(int uart, float TI) {
-  write_uart_message(uart, 0);
+  write_uart_message_request(uart, 0);
 
   float TI_temp = read_uart_message(uart, 0);
   
