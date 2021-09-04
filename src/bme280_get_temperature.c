@@ -13,6 +13,12 @@ struct identifier {
   int8_t fd;
 };
 
+struct bme280_dev dev;
+struct identifier id;
+
+/* Variable to define the result */
+int8_t rslt = BME280_OK;
+
 void user_delay_us(uint32_t period, void *intf_ptr);
 
 void print_sensor_data(struct bme280_data *device_data);
@@ -23,14 +29,7 @@ int8_t user_i2c_write(uint8_t reg_addr, const uint8_t *data, uint32_t len, void 
 
 int8_t stream_sensor_data_forced_mode(struct bme280_dev *dev);
 
-float bme280_get_temperature() {
-  struct bme280_dev dev;
-  struct identifier id;
-  struct bme280_data device_data;
-
-  /* Variable to define the result */
-  int8_t rslt = BME280_OK;
-
+void setup_bme280() {
   if ((id.fd = open("/dev/i2c-1", O_RDWR)) < 0) {
     fprintf(stderr, "Failed to open the i2c bus %s\n", "/dev/i2c-1");
     exit(1);
@@ -59,6 +58,10 @@ float bme280_get_temperature() {
     fprintf(stderr, "Failed to initialize the device (code %+d).\n", rslt);
     exit(1);
   }
+}
+
+float bme280_get_temperature() {
+  struct bme280_data device_data;
 
   rslt = stream_sensor_data_forced_mode(&dev);
   rslt = bme280_get_sensor_data(BME280_ALL, &device_data, &dev);
@@ -175,4 +178,8 @@ int8_t stream_sensor_data_forced_mode(struct bme280_dev *dev) {
   dev->delay_us(req_delay, dev->intf_ptr);
 
   return rslt;
+}
+
+void close_bme280() {
+  close(id.fd);
 }
