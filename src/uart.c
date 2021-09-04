@@ -175,6 +175,10 @@ float DS18B20_temperature(int uart, float TI) {
   return TI_temp;
 }
 
+void send_control_signal(int uart, int control_signal) {
+  write_uart_message_send(uart, control_signal);
+}
+
 void close_uart(int uart) {
   close(uart);
 }

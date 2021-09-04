@@ -19,6 +19,7 @@ void write_uart_message_send(int uart, int control_signal);
 float read_uart_message(int uart, int code);
 float potentiometer_temperature(int uart, float TR);
 float DS18B20_temperature(int uart, float TI);
+void send_control_signal(int uart, int control_signal);
 void close_uart(int uart);
 
 #endif
