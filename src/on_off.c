@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include "gpio.h"
 
-void on_off_control(float TR, float TI, int hysteresis) {
-  float control_output = 0.0;
+int on_off_control(float TR, float TI, int hysteresis) {
+  int control_output = 0;
 
   float top_limit = TR + hysteresis / 2.0;
   float bottom_limit = TR - hysteresis / 2.0;
@@ -14,4 +14,6 @@ void on_off_control(float TR, float TI, int hysteresis) {
     control_output = 100;
     manage_gpio_devices(control_output);
   }
+
+  return control_output;
 }

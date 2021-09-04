@@ -43,7 +43,9 @@ int main(int argc, char *argv[]) {
 
     // control_output = pid_control(TI);
 
-    on_off_control(TR, TI, 2);
+    control_output = on_off_control(TR, TI, 2);
+
+    send_control_signal(uart, control_output);
 
     // manage_gpio_devices(control_output);
 
