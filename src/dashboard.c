@@ -4,8 +4,25 @@
 #include <curses.h>
 #include "dashboard.h"
 
-WINDOW *info_win;
+int startx = 0;
+int starty = 0;
+WINDOW *menu_win, *info_win;
 
+char *choices[] = {
+	"1) Utilizar referência do potenciômetro",
+	"2) Definir temperatura de referência pela linha de comando",
+	"3) Definir estratégia de controle via botão físico",
+	"4) Definir estratégia de controle via PID",
+	"5) Definir estratégia de controle via ON_OFF",
+	"6) Sair",
+};
+
+int n_choices = sizeof(choices) / sizeof(char *);
+void print_menu(WINDOW *menu_win, int highlight);
+void clear_window(WINDOW *window);
+void new_temperature_reference();
+void new_hysteresis();
+void new_pid_constants();
 void clear_window(WINDOW *window);
 
 void info(float TR, float TI, float TE, int potentiometer, int pid, float Kp, float Ki, float Kd, int hysteresis) {
@@ -35,9 +52,191 @@ void info(float TR, float TI, float TE, int potentiometer, int pid, float Kp, fl
 	wrefresh(info_win);
 }
 
+void menu(int potentiometer, int pid, float TR, float hysteresis, float Kp, float Ki, float Kd) {
+	int highlight = 1;
+	int choice = 0;
+	int c;
+
+	initscr();
+	clear();
+	noecho();
+	cbreak();
+	curs_set(0);
+	start_color();
+	init_pair(1, COLOR_BLUE, COLOR_BLACK);
+
+	menu_win = newwin(HEIGHT, WIDTH, 0, 0);
+	keypad(menu_win, TRUE);
+	refresh();
+
+	while (1) {
+		print_menu(menu_win, highlight);
+		c = wgetch(menu_win);
+
+		switch (c) {
+			case KEY_UP:
+				if (highlight == 1)
+					highlight = n_choices;
+				else
+					--highlight;
+				break;
+
+			case KEY_DOWN:
+				if (highlight == n_choices)
+					highlight = 1;
+				else
+					++highlight;
+				break;
+
+			case 10:
+				choice = highlight;
+				if (choice == 1) {
+					TR = 70;
+					potentiometer = 1;
+				}
+				
+				if (choice == 2) {
+					clear_window(menu_win);
+					menu_win = newwin(HEIGHT, WIDTH, 0, 0);
+					new_temperature_reference(TR);
+					potentiometer = 0;
+					keypad(menu_win, TRUE);
+					refresh();
+				} else if (choice == 3) {
+					// finish();
+					break;
+				} else if (choice == 4) {
+					new_pid_constants(Kp, Ki, Kd);
+					pid = 1;
+					break;
+				} else if (choice == 5) {
+					clear_window(menu_win);
+					menu_win = newwin(HEIGHT, WIDTH, 0, 0);
+					new_hysteresis(hysteresis);
+					pid = 0;
+					keypad(menu_win, TRUE);
+					refresh();
+				}
+
+				break;
+
+			default:
+				refresh();
+				break;
+		}
+	};
+}
+
+void print_menu(WINDOW *menu_win, int highlight) {
+	int x, y, i;
+
+	x = 2;
+	y = 2;
+	box(menu_win, 0, 0);
+	for (i = 0; i < n_choices; ++i)
+	{
+		if (highlight == i + 1) /* High light the present choice */
+		{
+			wattron(menu_win, A_REVERSE);
+			mvwprintw(menu_win, y, x, "%s", choices[i]);
+			wattroff(menu_win, A_REVERSE);
+		}
+		else
+			mvwprintw(menu_win, y, x, "%s", choices[i]);
+		++y;
+	}
+	wrefresh(menu_win);
+}
+
 void clear_window(WINDOW *window) {
 	wclear(window);
 	wborder(window, ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ');
 	wrefresh(window);
 	delwin(window);
+}
+
+void new_temperature_reference(float TR) {
+	WINDOW *local_window;
+	float temperature_reference;
+	int max_height, max_width;
+	int _startx, _starty;
+
+	getmaxyx(stdscr, max_height, max_width);
+
+	_starty = (LINES - max_height) / 2;
+	_startx = (COLS - max_width) / 2;
+	refresh();
+
+	local_window = newwin(HEIGHT, WIDTH, _starty, _startx);
+
+	echo();
+
+	wattron(local_window, COLOR_PAIR(1));
+	mvwprintw(local_window, _starty + 1, _startx + 1, "Insira a temperatura de referência: ");
+	wattroff(local_window, COLOR_PAIR(1));
+	wmove(local_window, _starty + 1, _startx + 38);
+	wscanw(local_window, "%f", &temperature_reference);
+	TR = temperature_reference;
+}
+
+void new_hysteresis(float hysteresis) {
+	WINDOW *local_window;
+	int hysteresis_input;
+	int max_height, max_width;
+	int _startx, _starty;
+
+	getmaxyx(stdscr, max_height, max_width);
+
+	_starty = (LINES - max_height) / 2;
+	_startx = (COLS - max_width) / 2;
+	refresh();
+
+	local_window = newwin(HEIGHT, WIDTH, _starty, _startx);
+
+	echo();
+
+	wattron(local_window, COLOR_PAIR(1));
+	mvwprintw(local_window, _starty + 1, _startx + 1, "Insira o valor para histerese: ");
+	wattroff(local_window, COLOR_PAIR(1));
+	wmove(local_window, _starty + 1, _startx + 32);
+	wscanw(local_window, "%d", &hysteresis_input);
+	hysteresis = hysteresis_input;
+}
+
+void new_pid_constants(float Kp, float Ki, float Kd) {
+	WINDOW *local_window;
+	float Kp_input, Ki_input, Kd_input;
+	int max_height, max_width;
+	int _startx, _starty;
+
+	getmaxyx(stdscr, max_height, max_width);
+
+	_starty = (LINES - max_height) / 2;
+	_startx = (COLS - max_width) / 2;
+	refresh();
+
+	local_window = newwin(HEIGHT, WIDTH, _starty, _startx);
+
+	echo();
+
+	wattron(local_window, COLOR_PAIR(1));
+	mvwprintw(local_window, _starty + 1, _startx + 1, "Insira o valor para Kp: ");
+	wattroff(local_window, COLOR_PAIR(1));
+	wmove(local_window, _starty + 1, _startx + 25);
+	wscanw(local_window, "%f", &Kp_input);
+	Kp = Kp_input;
+
+	wattron(local_window, COLOR_PAIR(1));
+	mvwprintw(local_window, _starty + 2, _startx + 1, "Insira o valor para Ki: ");
+	wattroff(local_window, COLOR_PAIR(1));
+	wmove(local_window, _starty + 2, _startx + 25);
+	wscanw(local_window, "%f", &Ki_input);
+	Ki = Ki_input;
+
+	wattron(local_window, COLOR_PAIR(1));
+	mvwprintw(local_window, _starty + 3, _startx + 1, "Insira o valor para Kd: ");
+	wattroff(local_window, COLOR_PAIR(1));
+	wmove(local_window, _starty + 3, _startx + 25);
+	wscanw(local_window, "%f", &Kd_input);
+	Kd = Kd_input;
 }
