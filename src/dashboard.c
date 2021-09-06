@@ -8,23 +8,24 @@ WINDOW *info_win;
 
 void clear_window(WINDOW *window);
 
-void info(float TR, float TI, float TE, int potentiometer, int pid, int hysteresis) {
+void info(float TR, float TI, float TE, int potentiometer, int pid, float Kp, float Ki, float Kd, int hysteresis) {
 	clear_window(info_win);
-	info_win = newwin(HEIGHT, WIDTH, 0, WIDTH);
+	info_win = newwin(HEIGHT, WIDTH, 0, WIDTH + 2);
 	box(info_win, 0, 0);
 
   mvwprintw(info_win, 2, 30, "INFORMACOES");
 
 	if (potentiometer) {
-		mvwprintw(info_win, 4, 2, "Temperatura de Referência escolhida: POTENCIOMETRO");
+		mvwprintw(info_win, 4, 2, "Temperatura de Referência definida: POTENCIOMETRO");
 	} else {
-		mvwprintw(info_win, 4, 2, "Temperatura de Referência escolhida: LINHA DE COMANDO");
+		mvwprintw(info_win, 4, 2, "Temperatura de Referência definida: LINHA DE COMANDO");
 	}
 
   if (pid) {
-    mvwprintw(info_win, 6, 2, "Estratégia de controle escolhida: PID");
+    mvwprintw(info_win, 6, 2, "Estratégia de controle definida: PID");
+    mvwprintw(info_win, 7, 2, "Kp: %4.2f | Ki: %4.2f | Kd: %4.2f", Kp, Ki, Kd);
   } else {
-    mvwprintw(info_win, 6, 2, "Estratégia de controle escolhida: ON_OFF");
+    mvwprintw(info_win, 6, 2, "Estratégia de controle definida: ON_OFF");
     mvwprintw(info_win, 7, 2, "Histerese: %d", hysteresis);
   }
 

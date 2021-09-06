@@ -4,6 +4,6 @@
 #define WIDTH 70
 #define HEIGHT 15
 
-void info(float TR, float TI, float TE, int potentiometer, int pid, int hysteresis);
+void info(float TR, float TI, float TE, int potentiometer, int pid, float Kp, float Ki, float Kd, int hysteresis);
 
 #endif
