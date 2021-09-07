@@ -57,15 +57,16 @@ void write_uart_message_request(int uart, int code) {
   p_tx_buffer += 2;
 
   if (uart != -1) {
-    printf("Escrevendo caracteres na UART ...\n");
+    // printf("Escrevendo caracteres na UART ...\n");
 
     int count = write(uart, &tx_buffer[0], (p_tx_buffer - &tx_buffer[0]));
 
     if (count < 0) {
       printf("UART TX error!\n");
-    } else {
-      printf("Escrito!\n");
-    }
+    } 
+    // else {
+    //   printf("Escrito!\n");
+    // }
   }
 
   sleep(1);
@@ -96,15 +97,16 @@ void write_uart_message_send(int uart, int control_signal) {
   p_tx_buffer += 2;
 
   if (uart != -1) {
-    printf("Escrevendo caracteres na UART ...\n");
+    // printf("Escrevendo caracteres na UART ...\n");
 
     int count = write(uart, &tx_buffer[0], (p_tx_buffer - &tx_buffer[0]));
 
     if (count < 0) {
       printf("UART TX error!\n");
-    } else {
-      printf("Escrito!\n");
     }
+    // else {
+    //   printf("Escrito!\n");
+    // }
   }
 
   sleep(1);
@@ -173,6 +175,14 @@ float DS18B20_temperature(int uart, float TI) {
   }
 
   return TI_temp;
+}
+
+int get_key_state(int uart) {
+  write_uart_message_request(uart, 2);
+
+  int key_state = read_uart_message(uart, 2);
+
+  return key_state;
 }
 
 void send_control_signal(int uart, int control_signal) {

@@ -5,6 +5,6 @@
 #define HEIGHT 15
 
 void info(float TR, float TI, float TE, int potentiometer, int pid, float Kp, float Ki, float Kd, int hysteresis);
-void menu(int potentiometer, int pid, float TR, float hysteresis, float Kp, float Ki, float Kd);
+void menu();
 
 #endif

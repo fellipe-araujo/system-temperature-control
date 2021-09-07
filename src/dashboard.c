@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <curses.h>
 #include "dashboard.h"
+#include "main.h"
 
 int startx = 0;
 int starty = 0;
@@ -52,7 +53,7 @@ void info(float TR, float TI, float TE, int potentiometer, int pid, float Kp, fl
 	wrefresh(info_win);
 }
 
-void menu(int potentiometer, int pid, float TR, float hysteresis, float Kp, float Ki, float Kd) {
+void menu() {
 	int highlight = 1;
 	int choice = 0;
 	int c;
@@ -91,31 +92,32 @@ void menu(int potentiometer, int pid, float TR, float hysteresis, float Kp, floa
 			case 10:
 				choice = highlight;
 				if (choice == 1) {
-					TR = 70;
-					potentiometer = 1;
+					set_potentiometer(1);
 				}
 				
 				if (choice == 2) {
 					clear_window(menu_win);
 					menu_win = newwin(HEIGHT, WIDTH, 0, 0);
-					new_temperature_reference(TR);
-					potentiometer = 0;
+					set_potentiometer(0);
+					new_temperature_reference();
 					keypad(menu_win, TRUE);
 					refresh();
 				} else if (choice == 3) {
 					// finish();
 					break;
 				} else if (choice == 4) {
-					new_pid_constants(Kp, Ki, Kd);
-					pid = 1;
+					new_pid_constants();
+					set_pid(1);
 					break;
 				} else if (choice == 5) {
 					clear_window(menu_win);
 					menu_win = newwin(HEIGHT, WIDTH, 0, 0);
-					new_hysteresis(hysteresis);
-					pid = 0;
+					new_hysteresis();
+					set_pid(0);
 					keypad(menu_win, TRUE);
 					refresh();
+				} else if (choice == 6) {
+					shut_down_system();
 				}
 
 				break;
@@ -155,7 +157,7 @@ void clear_window(WINDOW *window) {
 	delwin(window);
 }
 
-void new_temperature_reference(float TR) {
+void new_temperature_reference() {
 	WINDOW *local_window;
 	float temperature_reference;
 	int max_height, max_width;
@@ -176,10 +178,11 @@ void new_temperature_reference(float TR) {
 	wattroff(local_window, COLOR_PAIR(1));
 	wmove(local_window, _starty + 1, _startx + 38);
 	wscanw(local_window, "%f", &temperature_reference);
-	TR = temperature_reference;
+
+	set_temperature_reference_input(0, temperature_reference);
 }
 
-void new_hysteresis(float hysteresis) {
+void new_hysteresis() {
 	WINDOW *local_window;
 	int hysteresis_input;
 	int max_height, max_width;
@@ -200,10 +203,11 @@ void new_hysteresis(float hysteresis) {
 	wattroff(local_window, COLOR_PAIR(1));
 	wmove(local_window, _starty + 1, _startx + 32);
 	wscanw(local_window, "%d", &hysteresis_input);
-	hysteresis = hysteresis_input;
+	
+	set_new_hysteresis(hysteresis_input);
 }
 
-void new_pid_constants(float Kp, float Ki, float Kd) {
+void new_pid_constants() {
 	WINDOW *local_window;
 	float Kp_input, Ki_input, Kd_input;
 	int max_height, max_width;
@@ -224,19 +228,18 @@ void new_pid_constants(float Kp, float Ki, float Kd) {
 	wattroff(local_window, COLOR_PAIR(1));
 	wmove(local_window, _starty + 1, _startx + 25);
 	wscanw(local_window, "%f", &Kp_input);
-	Kp = Kp_input;
 
 	wattron(local_window, COLOR_PAIR(1));
 	mvwprintw(local_window, _starty + 2, _startx + 1, "Insira o valor para Ki: ");
 	wattroff(local_window, COLOR_PAIR(1));
 	wmove(local_window, _starty + 2, _startx + 25);
 	wscanw(local_window, "%f", &Ki_input);
-	Ki = Ki_input;
 
 	wattron(local_window, COLOR_PAIR(1));
 	mvwprintw(local_window, _starty + 3, _startx + 1, "Insira o valor para Kd: ");
 	wattroff(local_window, COLOR_PAIR(1));
 	wmove(local_window, _starty + 3, _startx + 25);
 	wscanw(local_window, "%f", &Kd_input);
-	Kd = Kd_input;
+
+	set_new_pid_constants(Kp_input, Ki_input, Kd_input);
 }
