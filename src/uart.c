@@ -112,9 +112,8 @@ void write_uart_message_send(int uart, int control_signal) {
   sleep(1);
 }
 
-float read_uart_message(int uart, int code) {
-  float response_float = 0.0;
-  int response_integer = 0;
+float read_uart_message_temperature(int uart) {
+  float response = 0.0;
   //-------------- CHECK FOR ANY RX BYTES --------------
   if (uart != -1) {
     // Read up to 255 characters from the port if they are there
@@ -123,40 +122,52 @@ float read_uart_message(int uart, int code) {
 
     if (rx_length < 0) {
       printf("Erro na leitura! RX_LENGTH: %d\n", rx_length);
-      response_float = -1;
-      response_integer = -1;
+      response = -1;
     } else if (rx_length == 0) {
       printf("Nenhum dado disponível.\n");
-      response_float = -1;
-      response_integer = -1;
+      response = -1;
     } else {
       rx_buffer[rx_length] = '\0';
-
-      if (code == 0 || code == 1) {
-        float float_data;
-        memcpy(&float_data, &rx_buffer[3], 4);
-        // printf("Float: %f\n", float_data);
-        response_float = float_data;
-      } else {
-        int integer_data;
-        memcpy(&integer_data, &rx_buffer[3], 4);
-        // printf("Integer: %d\n", integer_data);
-        response_integer = integer_data;
-      }
+      float data;
+      memcpy(&data, &rx_buffer[3], 4);
+      // printf("Float: %f\n", data);
+      response = data;
     }
   }
 
-  if (code == 0 || code == 1) {
-    return response_float;
-  } else {
-    return response_integer;
+  return response;
+}
+
+int read_uart_message_key_state(int uart) {
+  int response = -1;
+  //-------------- CHECK FOR ANY RX BYTES --------------
+  if (uart != -1) {
+    // Read up to 255 characters from the port if they are there
+    unsigned char rx_buffer[256];
+    int rx_length = read(uart, (void *)rx_buffer, 255);
+
+    if (rx_length < 0) {
+      printf("Erro na leitura! RX_LENGTH: %d\n", rx_length);
+      response = -1;
+    } else if (rx_length == 0) {
+      printf("Nenhum dado disponível.\n");
+      response = -1;
+    } else {
+      rx_buffer[rx_length] = '\0';
+      int data;
+      memcpy(&data, &rx_buffer[3], 4);
+      // printf("Float: %d\n", data);
+      response = data;
+    }
   }
+
+  return response;
 }
 
 float potentiometer_temperature(int uart, float TR) {
-  write_uart_message_request(uart, 1);
+  write_uart_message_request(uart, POTENTIOMETER);
   
-  float TR_temp = read_uart_message(uart, 1);
+  float TR_temp = read_uart_message_temperature(uart);
   
   if (TR_temp < 0) {
     TR_temp = TR;
@@ -166,9 +177,9 @@ float potentiometer_temperature(int uart, float TR) {
 }
 
 float DS18B20_temperature(int uart, float TI) {
-  write_uart_message_request(uart, 0);
+  write_uart_message_request(uart, DS18B20);
 
-  float TI_temp = read_uart_message(uart, 0);
+  float TI_temp = read_uart_message_temperature(uart);
   
   if (TI_temp < 0) {
     TI_temp = TI;
@@ -178,9 +189,9 @@ float DS18B20_temperature(int uart, float TI) {
 }
 
 int get_key_state(int uart) {
-  write_uart_message_request(uart, 2);
+  write_uart_message_request(uart, KEY_STATE);
 
-  int key_state = read_uart_message(uart, 2);
+  int key_state = read_uart_message_key_state(uart);
 
   return key_state;
 }
