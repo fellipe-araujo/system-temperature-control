@@ -68,6 +68,8 @@ void menu() {
 	init_pair(1, COLOR_BLUE, COLOR_BLACK);
 
 	menu_win = newwin(HEIGHT, WIDTH, 0, 0);
+	mvwprintw(menu_win, 2, 34, "MENU");
+	wrefresh(menu_win);
 	keypad(menu_win, TRUE);
 	refresh();
 
@@ -127,6 +129,9 @@ void menu() {
 				refresh();
 				break;
 		}
+
+		mvwprintw(menu_win, 2, 34, "MENU");
+		wrefresh(menu_win);
 	};
 }
 
@@ -134,20 +139,20 @@ void print_menu(WINDOW *menu_win, int highlight) {
 	int x, y, i;
 
 	x = 2;
-	y = 2;
+	y = 4;
 	box(menu_win, 0, 0);
-	for (i = 0; i < n_choices; ++i)
-	{
-		if (highlight == i + 1) /* High light the present choice */
-		{
+
+	for (i = 0; i < n_choices; ++i) {
+		if (highlight == i + 1) {
 			wattron(menu_win, A_REVERSE);
 			mvwprintw(menu_win, y, x, "%s", choices[i]);
 			wattroff(menu_win, A_REVERSE);
-		}
-		else
+		} else {
 			mvwprintw(menu_win, y, x, "%s", choices[i]);
+		}
 		++y;
 	}
+
 	wrefresh(menu_win);
 }
 
