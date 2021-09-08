@@ -3,5 +3,6 @@
 
 void lcd_print(float tr, float ti, float te);
 void ClrLcd(void);
+void setup_lcd();
 
 #endif

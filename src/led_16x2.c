@@ -2,6 +2,7 @@
 #include <wiringPiI2C.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <unistd.h>
 
 // Define some device parameters
 #define I2C_ADDR   0x27 // I2C device address
@@ -31,14 +32,8 @@ void typeChar(char val);
 int fd;  // seen by all subroutines
 
 void lcd_print(float tr, float ti, float te) {
-  if (wiringPiSetup () == -1) exit (1);
+  usleep(100000);
 
-  fd = wiringPiI2CSetup(I2C_ADDR);
-
-  lcd_init(); // setup LCD
-
-  delay(2000);
-  ClrLcd();
   lcdLoc(LINE1);
   typeln("TR:");
   typeFloat(tr);
@@ -101,8 +96,12 @@ void lcd_toggle_enable(int bits) {
   delayMicroseconds(500);
 }
 
-void lcd_init()   {
+void setup_lcd()   {
   // Initialise display
+  if (wiringPiSetup () == -1) exit (1);
+
+  fd = wiringPiI2CSetup(I2C_ADDR);
+
   lcd_byte(0x33, LCD_CMD); // Initialise
   lcd_byte(0x32, LCD_CMD); // Initialise
   lcd_byte(0x06, LCD_CMD); // Cursor move direction
