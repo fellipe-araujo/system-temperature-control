@@ -1,8 +1,4 @@
-#include <wiringPi.h>
-#include <wiringPiI2C.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <unistd.h>
+#include "led_16x2.h"
 
 // Define some device parameters
 #define I2C_ADDR   0x27 // I2C device address

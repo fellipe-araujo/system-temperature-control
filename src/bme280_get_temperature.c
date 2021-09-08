@@ -1,12 +1,4 @@
-#include <linux/i2c-dev.h>
-#include <sys/ioctl.h>
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <fcntl.h>
-#include "bme280.h"
+#include "bme280_get_temperature.h"
 
 struct identifier {
   uint8_t dev_addr;
@@ -142,9 +134,6 @@ int8_t stream_sensor_data_forced_mode(struct bme280_dev *dev) {
 
   /* Variable to store minimum wait time between consecutive measurement in force mode */
   uint32_t req_delay;
-
-  /* Structure to get the pressure, temperature and humidity values */
-  struct bme280_data device_data;
 
   /* Recommended mode of operation: Indoor navigation */
   dev->settings.osr_h = BME280_OVERSAMPLING_1X;

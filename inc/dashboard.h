@@ -1,6 +1,12 @@
 #ifndef DASHBOARD_H_
 #define DASHBOARD_H_
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <curses.h>
+#include "main.h"
+
 #define WIDTH 72
 #define HEIGHT 15
 

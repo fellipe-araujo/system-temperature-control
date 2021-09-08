@@ -1,9 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <curses.h>
 #include "dashboard.h"
-#include "main.h"
 
 int startx = 0;
 int starty = 0;

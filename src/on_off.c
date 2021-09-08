@@ -1,5 +1,4 @@
-#include <stdio.h>
-#include "gpio.h"
+#include "on_off.h"
 
 int on_off_control(float TR, float TI, int hysteresis) {
   int control_output = 0;

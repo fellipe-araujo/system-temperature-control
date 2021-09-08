@@ -1,9 +1,3 @@
-#include <stdio.h>
-#include <string.h>
-#include <unistd.h>  // Used for UART
-#include <fcntl.h>   // Used for UART
-#include <termios.h> // Used for UART
-#include "crc16.h"
 #include "uart.h"
 
 int init_uart() {

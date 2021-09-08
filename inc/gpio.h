@@ -1,6 +1,10 @@
 #ifndef GPIO_H_
 #define GPIO_H_
 
+#include <stdio.h>
+#include <wiringPi.h>
+#include <softPwm.h>
+
 #define PWM_MAX_RANGE 100
 #define PWM_MIN_RANGE 0
 #define RESISTOR_PIN 4

@@ -1,3 +1,13 @@
+#ifndef UART_H_
+#define UART_H_
+
+#include <stdio.h>
+#include <string.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <termios.h>
+#include "crc16.h"
+
 #define SERVER_CODE 0x01
 #define REQUEST_CODE 0x23
 #define SEND_CODE 0x16
@@ -9,9 +19,6 @@
 #define POTENTIOMETER 1
 #define KEY_STATE 2
 #define CONTROL_SIGNAL 3
-
-#ifndef UART_H_
-#define UART_H_
 
 int init_uart();
 void write_uart_message_request(int uart, int code);

@@ -1,3 +1,6 @@
+#ifndef MAIN_H_
+#define MAIN_H_
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -12,9 +15,6 @@
 #include "on_off.h"
 #include "dashboard.h"
 #include "csv.h"
-
-#ifndef MAIN_H_
-#define MAIN_H_
 
 void shut_down_system();
 void set_use_key_switch();

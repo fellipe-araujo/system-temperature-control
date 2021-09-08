@@ -1,5 +1,4 @@
 #include "pid.h"
-#include <stdio.h>
 
 double measurement_output, signal_control;
 double reference = 0.0;

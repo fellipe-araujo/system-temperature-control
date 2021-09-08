@@ -1,6 +1,3 @@
-#include <stdio.h>
-#include <wiringPi.h>
-#include <softPwm.h>
 #include "gpio.h"
 
 void setup_gpio() {
