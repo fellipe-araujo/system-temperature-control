@@ -16,6 +16,7 @@
 #define MAIN_H_
 
 void shut_down_system();
+void set_use_key_switch();
 void set_potentiometer(int value);
 void set_pid(int value);
 void set_temperature_reference_input(int potentiometer_active, float new_temperature);

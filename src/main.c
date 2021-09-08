@@ -12,7 +12,7 @@ float Kp = 5.0, Ki = 1.0, Kd = 5.0;
 int potentiometer = 1;
 int pid = 1;
 float hysteresis = 2.0;
-int key_status = 0;
+int use_key_switch = 0;
 
 int main(int argc, char *argv[]) {
   pthread_t tid[2];
@@ -34,7 +34,7 @@ void info_thread() {
   signal(SIGINT, shut_down_system);
 
   while (1) {
-    if (key_status) {
+    if (use_key_switch) {
       check_key_state();
     }
 
@@ -62,6 +62,14 @@ void get_temperatures() {
   
   TI = DS18B20_temperature(uart, TI);
   TE = bme280_get_temperature();
+}
+
+void set_use_key_switch() {
+  if (use_key_switch) {
+    use_key_switch = 0;
+  } else {
+    use_key_switch = 1;
+  }
 }
 
 void check_key_state() {
