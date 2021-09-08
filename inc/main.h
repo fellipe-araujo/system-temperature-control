@@ -11,6 +11,7 @@
 #include "gpio.h"
 #include "on_off.h"
 #include "dashboard.h"
+#include "csv.h"
 
 #ifndef MAIN_H_
 #define MAIN_H_

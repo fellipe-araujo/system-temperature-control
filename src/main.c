@@ -1,6 +1,7 @@
 #include "main.h"
 
 void info_thread();
+void write_csv_thread();
 void get_temperatures();
 void check_key_state();
 void get_control_signal();
@@ -15,17 +16,21 @@ float hysteresis = 2.0;
 int use_key_switch = 0;
 
 int main(int argc, char *argv[]) {
-  pthread_t tid[2];
+  pthread_t tid[3];
 
   uart = init_uart();
   setup_gpio();
   setup_bme280();
+  setup_lcd();
+  setup_csv();
   
   pthread_create(&tid[0], NULL, (void *)menu, (void *)NULL);
 	pthread_create(&tid[1], NULL, (void *)info_thread, (void *)NULL);
+	pthread_create(&tid[2], NULL, (void *)write_csv_thread, (void *)NULL);
 
 	pthread_join(tid[0], NULL);
 	pthread_join(tid[1], NULL);
+	pthread_join(tid[2], NULL);
 
   return 0;
 }
@@ -42,11 +47,23 @@ void info_thread() {
     lcd_print(TR, TI, TE);
 
     get_control_signal();
-
     send_control_signal(uart, control_output);
-    info(TR, TI, TE, potentiometer, pid, Kp, Ki, Kd, hysteresis);
 
-    sleep(1);
+    info(TR, TI, TE, potentiometer, pid, Kp, Ki, Kd, hysteresis, use_key_switch);
+
+    usleep(700000);
+  }
+}
+
+void write_csv_thread() {
+  while (1) {
+    if (pid) {
+      write_csv(TR, TI, TE, control_output);
+    } else if (!pid && control_output != 0) {
+      write_csv(TR, TI, TE, control_output);
+    }
+
+    sleep(2);
   }
 }
 
@@ -89,7 +106,11 @@ void get_control_signal() {
     control_output = pid_control(TI);
     manage_gpio_devices(control_output);
   } else {
-    control_output = on_off_control(TR, TI, hysteresis);
+    int control_output_temp = on_off_control(TR, TI, hysteresis);
+    
+    if (control_output_temp != 0) {
+      control_output = control_output_temp;
+    }
   }
 }
 
