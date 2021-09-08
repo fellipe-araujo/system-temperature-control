@@ -5,7 +5,7 @@ int starty = 0;
 WINDOW *menu_win, *info_win;
 
 char *choices[] = {
-	"1) Utilizar referência do potenciômetro",
+	"1) Utilizar temperatura de referência do potenciômetro",
 	"2) Definir temperatura de referência pela linha de comando",
 	"3) Ativar/Desativar estratégia de controle via botão físico",
 	"4) Definir estratégia de controle via PID",
