@@ -12,7 +12,7 @@ WINDOW *menu_win, *info_win;
 char *choices[] = {
 	"1) Utilizar referência do potenciômetro",
 	"2) Definir temperatura de referência pela linha de comando",
-	"3) Definir estratégia de controle via botão físico",
+	"3) Ativar/Desativar estratégia de controle via botão físico",
 	"4) Definir estratégia de controle via PID",
 	"5) Definir estratégia de controle via ON_OFF",
 	"6) Sair",
@@ -26,12 +26,12 @@ void new_hysteresis();
 void new_pid_constants();
 void clear_window(WINDOW *window);
 
-void info(float TR, float TI, float TE, int potentiometer, int pid, float Kp, float Ki, float Kd, int hysteresis) {
+void info(float TR, float TI, float TE, int potentiometer, int pid, float Kp, float Ki, float Kd, int hysteresis, int use_key_switch) {
 	clear_window(info_win);
 	info_win = newwin(HEIGHT, WIDTH, 0, WIDTH + 2);
 	box(info_win, 0, 0);
 
-  mvwprintw(info_win, 2, 30, "INFORMACOES");
+  mvwprintw(info_win, 2, 31, "INFORMACOES");
 
 	if (potentiometer) {
 		mvwprintw(info_win, 4, 2, "Temperatura de Referência definida: POTENCIOMETRO");
@@ -39,17 +39,23 @@ void info(float TR, float TI, float TE, int potentiometer, int pid, float Kp, fl
 		mvwprintw(info_win, 4, 2, "Temperatura de Referência definida: LINHA DE COMANDO");
 	}
 
+	if (use_key_switch) {
+		mvwprintw(info_win, 6, 2, "Chave Externa: ATIVADA");
+	} else {
+		mvwprintw(info_win, 6, 2, "Chave Externa: DESATIVADA");
+	}
+
   if (pid) {
-    mvwprintw(info_win, 6, 2, "Estratégia de controle definida: PID");
-    mvwprintw(info_win, 7, 2, "Kp: %4.2f | Ki: %4.2f | Kd: %4.2f", Kp, Ki, Kd);
+    mvwprintw(info_win, 7, 2, "Estratégia de controle definida: PID");
+    mvwprintw(info_win, 8, 2, "Kp: %4.2f | Ki: %4.2f | Kd: %4.2f", Kp, Ki, Kd);
   } else {
-    mvwprintw(info_win, 6, 2, "Estratégia de controle definida: ON_OFF");
-    mvwprintw(info_win, 7, 2, "Histerese: %d", hysteresis);
+    mvwprintw(info_win, 7, 2, "Estratégia de controle definida: ON_OFF");
+    mvwprintw(info_win, 8, 2, "Histerese: %d", hysteresis);
   }
 
-  mvwprintw(info_win, 9, 2, "TR: %4.2f", TR);
-	mvwprintw(info_win, 10, 2, "TI: %4.2f", TI);
-	mvwprintw(info_win, 11, 2, "TE: %4.2f", TE);
+  mvwprintw(info_win, 10, 2, "TR: %4.2f", TR);
+	mvwprintw(info_win, 11, 2, "TI: %4.2f", TI);
+	mvwprintw(info_win, 12, 2, "TE: %4.2f", TE);
 	wrefresh(info_win);
 }
 
@@ -103,7 +109,7 @@ void menu() {
 					keypad(menu_win, TRUE);
 					refresh();
 				} else if (choice == 3) {
-					// finish();
+					set_use_key_switch();
 					break;
 				} else if (choice == 4) {
 					new_pid_constants();
